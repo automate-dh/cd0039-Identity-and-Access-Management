@@ -8,7 +8,7 @@
   <ion-button [href]="loginURL">Log In</ion-button>
 </ion-content>
 <ion-content *ngIf="auth.token">
-  <ion-button (click)="auth.logout()">Log Out</ion-button>
+  <ion-button href="https://jubr-coffee-shop.us.auth0.com/logout?client_id=itnmz7VSzYtRMTgGzzXbrMzwRIou1DnW&returnTo=http://127.0.0.1:8100/tabs/user-page" (click)="auth.logout()">Log Out</ion-button>
       <ion-item>
         <ion-label>Active JWT</ion-label>
         <ion-textarea [ngModel]="auth.token" name="Active JWT"></ion-textarea>

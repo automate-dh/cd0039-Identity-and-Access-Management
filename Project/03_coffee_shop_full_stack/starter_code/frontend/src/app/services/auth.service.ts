@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { $ } from 'protractor';
 
 import { environment } from '../../environments/environment';
 
@@ -30,6 +31,16 @@ export class AuthService {
     link += 'redirect_uri=' + this.callbackURL + callbackPath;
     return link;
   }
+
+  build_logout_link(callbackPath = '') { // remove this block
+    let link = 'https://';
+    link += this.url + '.auth0.com';
+    link += '/logout?';
+    link += 'client_id=' + this.clientId + '&';
+    //link += 'returnTO=' + this.callbackURL + callbackPath;
+    return link;
+  }
+
 
   // invoked in app.component on load
   check_token_fragment() {

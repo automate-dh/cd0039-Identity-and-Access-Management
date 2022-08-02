@@ -30,8 +30,7 @@ CORS(app)
 '''
 
 @app.route('/drinks', methods=['GET'])
-@requires_auth(permission='get:drinks')
-def get_drinks(jwt):
+def get_drinks():
     drinks = [drink.short() for drink in Drink.query.all()]
     return jsonify({
         "success": True,
@@ -72,12 +71,10 @@ def post_drinks(jwt):
     drink_info = request.json
 
     try:
-        drink = Drink(title=drink_info["title"], recipe=drink_info["recipe"])
+        drink = Drink(title=drink_info["title"], recipe=json.dumps(drink_info["recipe"]))
         drink.insert()
     except KeyError:
         abort(422)
-
-    drink = hello
 
     return jsonify({
         "success": True,
@@ -106,16 +103,16 @@ def update_drink(jwt, id):
         abort(422)
     else:
         if "title" in data:    
-            drink.title = data["title"]
+            drink.title = json.dumps(data["title"])
 
         if "recipe" in data:
-            drink.recipe = data["recipe"]
+            drink.recipe = json.dumps(data["recipe"])
 
         drink.update()
 
     return jsonify({
         "success": True,
-        "drinks": drink.long()
+        "drinks": [drink.long()]
     })
 
 
@@ -159,7 +156,6 @@ def unprocessable(error):
         "message": "unprocessable"
     }), 422
 
-
 '''
 @TODO implement error handlers using the @app.errorhandler(error) decorator
     each error handler should return (with approprate messages):
@@ -185,9 +181,6 @@ def not_found(error):
 
 @app.errorhandler(500)
 def internal_server_error(error):
-    print ("###########################")
-    print (error)
-    print ("###########################")
     return jsonify({
         "success": False,
         "error": 500,
@@ -202,11 +195,22 @@ def internal_server_error(error):
 
 @app.errorhandler(400)
 def bad_request(error):
+    print (error)
     return jsonify({
         "success": False,
         "error": 400,
-        "message": "Bad Request"
+        "message": "Bad Request",
+        "info": error.description
     }), 400
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": "Unauthorized",
+        "info": error.description
+    }), 401
 
 
 @app.errorhandler(403)
@@ -214,5 +218,6 @@ def forbidden(error):
     return jsonify({
         "success": False,
         "error": 403,
-        "message": "Forbidden"
+        "message": "Forbidden",
+        "info": error.description
     }), 403
